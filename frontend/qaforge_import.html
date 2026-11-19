@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QAForge — Import Project</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070b0f;--surf:#0c1016;--surf2:#111820;--surf3:#161f2a;
+  --b1:#1c2a38;--b2:#243344;
+  --ac:#00d4aa;--ac2:#0ea5e9;--acdim:#00d4aa15;
+  --tx:#dde6ef;--tx2:#7a8fa0;--tx3:#374f62;
+  --red:#f05a52;--yel:#dba83a;
+  --fh:'Syne',sans-serif;--fm:'JetBrains Mono',monospace;
+  --r:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.5;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--b1) 1px,transparent 1px),linear-gradient(90deg,var(--b1) 1px,transparent 1px);background-size:52px 52px;opacity:.18;pointer-events:none;}
+.layout{display:flex;height:100vh;position:relative;z-index:1;}
+.sb{width:216px;background:var(--surf);border-right:1px solid var(--b2);display:flex;flex-direction:column;flex-shrink:0;}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
+.logo-box{width:30px;height:30px;border-radius:7px;border:1px solid var(--ac);display:flex;align-items:center;justify-content:center;}
+.logo-q{font-family:var(--fh);font-size:15px;font-weight:800;color:var(--ac);}
+.logo-name{font-family:var(--fh);font-size:15px;font-weight:800;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav{padding:14px 0;flex:1;}
+.nav-sec{padding:5px 18px 4px;font-size:9px;letter-spacing:1.2px;color:var(--tx3);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:var(--tx2);border-left:2px solid transparent;transition:all .15s;font-size:12px;}
+.nav-item:hover{background:var(--surf2);color:var(--tx);}
+.nav-item.active{background:var(--acdim);color:var(--ac);border-left-color:var(--ac);}
+.nav-ic{width:16px;height:16px;flex-shrink:0;opacity:.7;}
+.nav-item.active .nav-ic,.nav-item:hover .nav-ic{opacity:1;}
+.nav-lbl{flex:1;}
+.badge{background:var(--surf3);border:1px solid var(--b2);border-radius:20px;padding:1px 7px;font-size:9px;color:var(--tx2);}
+.badge.alert{background:#f05a5218;border-color:#f05a5240;color:var(--red);}
+.sb-user{padding:14px 18px;border-top:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#06100d;flex-shrink:0;}
+.u-name{font-size:11px;color:var(--tx);}
+.u-role{font-size:9px;color:var(--tx3);}
+.online{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 5px var(--ac);margin-left:auto;}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{height:52px;background:var(--surf);border-bottom:1px solid var(--b2);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0;}
+.top-back{display:flex;align-items:center;gap:7px;color:var(--tx2);font-size:12px;cursor:pointer;transition:color .15s;padding:5px 8px;border-radius:5px;}
+.top-back:hover{color:var(--tx);background:var(--surf2);}
+.top-title{font-family:var(--fh);font-size:15px;font-weight:700;flex:1;}
+.top-title em{font-style:normal;font-family:var(--fm);font-size:11px;font-weight:400;color:var(--tx3);margin-left:8px;}
+.content{padding:28px 32px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;flex:1;}
+.method-tabs{display:flex;gap:10px;}
+.mtab{flex:1;padding:16px 18px;background:var(--surf);border:1px solid var(--b2);border-radius:var(--r);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;}
+.mtab:hover{border-color:var(--b1);background:var(--surf2);}
+.mtab.active{border-color:var(--ac);background:var(--acdim);}
+.mtab-icon{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mtab.active .mtab-icon{background:#00d4aa20;border:1px solid #00d4aa40;}
+.mtab:not(.active) .mtab-icon{background:var(--surf2);border:1px solid var(--b2);}
+.mtab-label{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:2px;}
+.mtab-sub{font-size:10px;color:var(--tx3);}
+.mtab.active .mtab-label{color:var(--ac);}
+.panel{background:var(--surf);border:1px solid var(--b2);border-radius:var(--r);overflow:hidden;}
+.panel-head{padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;}
+.panel-title{font-size:11px;color:var(--tx2);flex:1;letter-spacing:.3px;}
+.panel-body{padding:20px;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:10px;color:var(--tx2);margin-bottom:6px;letter-spacing:.8px;}
+.field label span{color:var(--ac);margin-right:4px;}
+.field input,.field select{width:100%;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;padding:9px 13px;font-size:12px;font-family:var(--fm);color:var(--tx);outline:none;transition:all .2s;}
+.field input:focus,.field select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acdim);}
+.field input::placeholder{color:var(--tx3);}
+.field select{cursor:pointer;}
+.field select option{background:var(--surf2);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.repo-search-wrap{position:relative;}
+.repo-search-wrap input{padding-left:34px;}
+.repo-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5;}
+.repo-results{margin-top:8px;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;overflow:hidden;display:none;}
+.repo-results.show{display:block;}
+.repo-result-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--b1);transition:background .15s;}
+.repo-result-item:last-child{border-bottom:none;}
+.repo-result-item:hover{background:var(--surf3);}
+.repo-lang-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.repo-name{font-size:12px;color:var(--tx);flex:1;}
+.repo-meta{font-size:10px;color:var(--tx3);}
+.repo-stars{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--tx3);}
+.dropzone{border:2px dashed var(--b2);border-radius:var(--r);padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;}
+.dropzone:hover,.dropzone.drag{border-color:var(--ac);background:var(--acdim);}
+.dz-icon{width:44px;height:44px;border-radius:10px;background:var(--surf2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.dz-title{font-size:13px;color:var(--tx);margin-bottom:4px;font-weight:500;}
+.dz-sub{font-size:11px;color:var(--tx3);}
+.dz-sub span{color:var(--ac);cursor:pointer;}
+.dz-formats{display:flex;justify-content:center;gap:6px;margin-top:14px;}
+.dz-fmt{font-size:9px;padding:3px 8px;border-radius:4px;background:var(--surf3);border:1px solid var(--b2);color:var(--tx3);}
+.file-selected{display:none;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;padding:12px 14px;align-items:center;gap:10px;}
+.file-selected.show{display:flex;}
+.file-icon{width:32px;height:32px;border-radius:6px;background:#00d4aa14;border:1px solid #00d4aa30;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.file-name{font-size:12px;color:var(--tx);flex:1;}
+.file-size{font-size:10px;color:var(--tx3);}
+.file-remove{cursor:pointer;color:var(--tx3);transition:color .15s;}
+.file-remove:hover{color:var(--red);}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.option-card{background:var(--surf2);border:1px solid var(--b2);border-radius:6px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:10px;}
+.option-card:hover{border-color:var(--b1);}
+.option-card.on{border-color:var(--ac);background:var(--acdim);}
+.opt-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--b2);flex-shrink:0;margin-top:1px;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.option-card.on .opt-check{background:var(--ac);border-color:var(--ac);}
+.opt-label{font-size:11px;color:var(--tx);margin-bottom:2px;font-weight:500;}
+.opt-desc{font-size:9px;color:var(--tx3);}
+.submit-row{display:flex;gap:10px;align-items:center;}
+.btn-primary{display:flex;align-items:center;gap:7px;background:linear-gradient(90deg,var(--ac),var(--ac2));border:none;border-radius:6px;padding:10px 20px;color:#06100d;font-size:12px;font-weight:700;font-family:var(--fm);cursor:pointer;letter-spacing:.4px;transition:all .2s;}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);}
+.btn-secondary{display:flex;align-items:center;gap:7px;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;padding:10px 16px;color:var(--tx2);font-size:12px;font-family:var(--fm);cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{color:var(--tx);border-color:var(--b1);}
+.submit-hint{font-size:10px;color:var(--tx3);margin-left:4px;}
+.prog-wrap{display:none;}
+.prog-wrap.show{display:flex;flex-direction:column;gap:20px;}
+.progress-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.prog-step{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;}
+.prog-step.done{border-color:#00d4aa30;background:#00d4aa08;}
+.prog-step.active{border-color:var(--ac);background:var(--acdim);}
+.prog-step.pending{opacity:.4;}
+.step-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;}
+.prog-step.done .step-icon{background:#00d4aa20;border:1px solid #00d4aa40;}
+.prog-step.active .step-icon{background:#00d4aa20;border:1px solid var(--ac);}
+.prog-step.pending .step-icon{background:var(--surf3);border:1px solid var(--b2);}
+.step-label{flex:1;font-size:12px;color:var(--tx);}
+.step-time{font-size:10px;color:var(--tx3);}
+.prog-bar-wrap{background:var(--surf2);border-radius:20px;height:4px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:20px;transition:width .4s ease;width:0%;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite;}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.panel{animation:fu .35s cubic-bezier(.16,1,.3,1) both;}
+</style>
+</head>
+<body>
+<div class="layout">
+<div class="sb">
+  <div class="sb-logo">
+    <div class="logo-box"><span class="logo-q">Q</span></div>
+    <span class="logo-name">QAForge</span>
+  </div>
+  <div class="nav">
+    <div class="nav-sec">OVERVIEW</div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span class="nav-lbl">Dashboard</span>
+    </div>
+    <div class="nav-item active">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-lbl">Projects</span><span class="badge">3</span>
+    </div>
+    <div class="nav-sec" style="margin-top:8px">ANALYSIS</div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-lbl">Defect Analysis</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M3 8h2l2-5 2 10 2-5h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-lbl">AI Generator</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.8 6.2l4.2.6-3 3 .7 4.2L8 12l-3.7 2 .7-4.2-3-3 4.2-.6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span class="nav-lbl">Risk Map</span><span class="badge alert">5</span>
+    </div>
+    <div class="nav-sec" style="margin-top:8px">WORKSPACE</div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-lbl">Test Cases</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.2 2 3 4.2 3 7c0 2 1.1 3.7 2.8 4.6L5 14h6l-.8-2.4C11.9 10.7 13 9 13 7c0-2.8-2.2-5-5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span class="nav-lbl">Bug Reports</span><span class="badge alert">2</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-ic" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-lbl">Reports</span>
+    </div>
+  </div>
+  <div class="sb-user">
+    <div class="avatar">DV</div>
+    <div style="flex:1;min-width:0;"><div class="u-name">dev@uni.edu</div><div class="u-role">QA Engineer</div></div>
+    <div class="online"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="top-back" onclick="history.back()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </div>
+    <div class="top-title">Import Project <em>/ new</em></div>
+  </div>
+
+  <!-- MAIN FORM -->
+  <div class="content" id="main-content">
+    <div class="method-tabs">
+      <div class="mtab active" id="tab-gh" onclick="setMethod('github')">
+        <div class="mtab-icon">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--ac)"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </div>
+        <div><div class="mtab-label">GitHub Repository</div><div class="mtab-sub">Connect via OAuth or URL</div></div>
+      </div>
+      <div class="mtab" id="tab-zip" onclick="setMethod('zip')">
+        <div class="mtab-icon">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M4 2h5.5L13 5.5V14H4V2z" stroke="var(--tx2)" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 2v4h4" stroke="var(--tx2)" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 8v4M7 8l-1.5 2M7 8l1.5 2" stroke="var(--tx2)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div><div class="mtab-label">Upload Archive</div><div class="mtab-sub">ZIP, TAR.GZ up to 500MB</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="github-form">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--ac)"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span class="panel-title">// github_repository</span>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label><span>→</span>SEARCH OR PASTE URL</label>
+          <div class="repo-search-wrap">
+            <svg class="repo-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="var(--tx3)" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="var(--tx3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input type="text" id="repo-input" placeholder="owner/repository or https://github.com/..." oninput="handleRepoInput(this.value)" onfocus="showResults()" onblur="setTimeout(hideResults,200)"/>
+          </div>
+          <div class="repo-results" id="repo-results">
+            <div class="repo-result-item" onclick="selectRepo('psf/requests')"><div class="repo-lang-dot" style="background:#3572a5"></div><div class="repo-name">psf / requests</div><div class="repo-meta">Python</div><div class="repo-stars"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--yel)"><path d="M8 1l1.8 4.2 4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>51.2k</div></div>
+            <div class="repo-result-item" onclick="selectRepo('tiangolo/fastapi')"><div class="repo-lang-dot" style="background:#3572a5"></div><div class="repo-name">tiangolo / fastapi</div><div class="repo-meta">Python</div><div class="repo-stars"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--yel)"><path d="M8 1l1.8 4.2 4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>74.1k</div></div>
+            <div class="repo-result-item" onclick="selectRepo('django/django')"><div class="repo-lang-dot" style="background:#3572a5"></div><div class="repo-name">django / django</div><div class="repo-meta">Python</div><div class="repo-stars"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--yel)"><path d="M8 1l1.8 4.2 4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>77.3k</div></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label><span>→</span>BRANCH</label><select><option>main</option><option>master</option><option>develop</option></select></div>
+          <div class="field"><label><span>→</span>LANGUAGE</label><select><option>Auto-detect</option><option>Python</option><option>Java</option><option>JavaScript</option><option>TypeScript</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="zip-form" style="display:none;">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2h5.5L13 5.5V14H4V2z" stroke="var(--ac)" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 2v4h4" stroke="var(--ac)" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <span class="panel-title">// upload_archive</span>
+      </div>
+      <div class="panel-body">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+          <div class="dz-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 8l5-5 5 5" stroke="var(--ac)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="var(--tx3)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="dz-title">Drop your archive here</div>
+          <div class="dz-sub">or <span onclick="event.stopPropagation();document.getElementById('file-input').click()">browse files</span></div>
+          <div class="dz-formats"><span class="dz-fmt">.zip</span><span class="dz-fmt">.tar.gz</span><span class="dz-fmt">.tar.bz2</span></div>
+        </div>
+        <div class="file-selected" id="file-selected">
+          <div class="file-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2h5.5L13 5.5V14H4V2z" stroke="var(--ac)" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1;min-width:0;"><div class="file-name" id="file-name">project.zip</div><div class="file-size" id="file-size">—</div></div>
+          <div class="file-remove" onclick="removeFile()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <input type="file" id="file-input" accept=".zip,.tar.gz,.tar.bz2" style="display:none" onchange="handleFileSelect(this)"/>
+        <div class="field" style="margin-top:14px;"><label><span>→</span>PROJECT NAME</label><input type="text" placeholder="my-project"/></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="var(--ac)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span class="panel-title">// analysis_options</span>
+      </div>
+      <div class="panel-body">
+        <div class="options-grid">
+          <div class="option-card on" onclick="toggleOpt(this)"><div class="opt-check"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#06100d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="opt-label">Git History Analysis</div><div class="opt-desc">Parse commits, bug-fix patterns, hotspots</div></div></div>
+          <div class="option-card on" onclick="toggleOpt(this)"><div class="opt-check"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#06100d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="opt-label">Risk Scoring</div><div class="opt-desc">Calculate file-level risk scores</div></div></div>
+          <div class="option-card on" onclick="toggleOpt(this)"><div class="opt-check"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#06100d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="opt-label">AI Test Generation</div><div class="opt-desc">Generate test scenarios via LLM</div></div></div>
+          <div class="option-card" onclick="toggleOpt(this)"><div class="opt-check"></div><div><div class="opt-label">Coverage Mapping</div><div class="opt-desc">Map existing tests to source files</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-primary" onclick="startImport()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Import & Analyse
+      </button>
+      <button class="btn-secondary" onclick="history.back()">Cancel</button>
+      <span class="submit-hint">analysis may take 1–3 min</span>
+    </div>
+  </div>
+
+  <!-- PROGRESS VIEW -->
+  <div class="content prog-wrap" id="progress-content">
+    <div class="panel">
+      <div class="panel-head">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="var(--ac)" stroke-width="1.4" stroke-dasharray="3 3"/></svg>
+        <span class="panel-title">// importing_project</span>
+        <span style="font-size:10px;color:var(--tx3)" id="prog-pct">0%</span>
+      </div>
+      <div style="padding:20px;">
+        <div class="progress-steps" id="prog-steps">
+          <div class="prog-step active" id="step-0"><div class="step-icon"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="spin"><circle cx="8" cy="8" r="6" stroke="var(--ac)" stroke-width="2" stroke-dasharray="10 8"/></svg></div><div class="step-label">Cloning repository...</div><div class="step-time" id="t0"></div></div>
+          <div class="prog-step pending" id="step-1"><div class="step-icon"><span style="color:var(--tx3);font-size:10px">2</span></div><div class="step-label">Parsing git history</div><div class="step-time" id="t1"></div></div>
+          <div class="prog-step pending" id="step-2"><div class="step-icon"><span style="color:var(--tx3);font-size:10px">3</span></div><div class="step-label">Analysing defect patterns</div><div class="step-time" id="t2"></div></div>
+          <div class="prog-step pending" id="step-3"><div class="step-icon"><span style="color:var(--tx3);font-size:10px">4</span></div><div class="step-label">Calculating risk scores</div><div class="step-time" id="t3"></div></div>
+          <div class="prog-step pending" id="step-4"><div class="step-icon"><span style="color:var(--tx3);font-size:10px">5</span></div><div class="step-label">Generating test scenarios (AI)</div><div class="step-time" id="t4"></div></div>
+        </div>
+        <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+let method='github';
+function setMethod(m){
+  method=m;
+  document.getElementById('tab-gh').classList.toggle('active',m==='github');
+  document.getElementById('tab-zip').classList.toggle('active',m==='zip');
+  document.getElementById('github-form').style.display=m==='github'?'':'none';
+  document.getElementById('zip-form').style.display=m==='zip'?'':'none';
+}
+function handleRepoInput(v){if(v.length>1)showResults();else hideResults();}
+function showResults(){document.getElementById('repo-results').classList.add('show');}
+function hideResults(){document.getElementById('repo-results').classList.remove('show');}
+function selectRepo(name){document.getElementById('repo-input').value=name;hideResults();}
+function handleDrop(e){e.preventDefault();document.getElementById('dropzone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)showFile(f);}
+function handleFileSelect(input){if(input.files[0])showFile(input.files[0]);}
+function showFile(f){document.getElementById('dropzone').style.display='none';document.getElementById('file-selected').classList.add('show');document.getElementById('file-name').textContent=f.name;document.getElementById('file-size').textContent=(f.size/1024/1024).toFixed(1)+' MB';}
+function removeFile(){document.getElementById('dropzone').style.display='block';document.getElementById('file-selected').classList.remove('show');document.getElementById('file-input').value='';}
+function toggleOpt(el){el.classList.toggle('on');const check=el.querySelector('.opt-check');if(el.classList.contains('on')){check.innerHTML=`<svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#06100d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}else{check.innerHTML='';}}
+const stepDurations=[1400,1000,900,700,1200];
+function startImport(){
+  document.getElementById('main-content').style.display='none';
+  document.getElementById('progress-content').classList.add('show');
+  runStep(0,0);
+}
+function runStep(idx,pct){
+  if(idx>=5){animatePct(pct,100,300);return;}
+  const step=document.getElementById('step-'+idx);
+  step.classList.remove('pending');step.classList.add('active');
+  const icon=step.querySelector('.step-icon');
+  icon.innerHTML=`<svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="spin"><circle cx="8" cy="8" r="6" stroke="var(--ac)" stroke-width="2" stroke-dasharray="10 8"/></svg>`;
+  const target=pct+20;
+  animatePct(pct,target,stepDurations[idx]);
+  setTimeout(()=>{
+    step.classList.remove('active');step.classList.add('done');
+    icon.innerHTML=`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="var(--ac)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    document.getElementById('t'+idx).textContent='done';
+    if(idx+1<5){document.getElementById('step-'+(idx+1)).classList.remove('pending');}
+    runStep(idx+1,target);
+  },stepDurations[idx]);
+}
+function animatePct(from,to,dur){
+  const start=performance.now();
+  function tick(now){
+    const p=Math.min((now-start)/dur,1);
+    const val=Math.round(from+(to-from)*p);
+    document.getElementById('prog-pct').textContent=val+'%';
+    document.getElementById('prog-bar').style.width=val+'%';
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+</script>
+</body>
+</html>

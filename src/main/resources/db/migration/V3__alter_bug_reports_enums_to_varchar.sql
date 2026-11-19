@@ -1,0 +1,7 @@
+ALTER TABLE bug_reports
+    ALTER COLUMN severity TYPE VARCHAR(50) USING severity::VARCHAR,
+    ALTER COLUMN status   TYPE VARCHAR(50) USING status::VARCHAR;
+
+ALTER TABLE bug_reports
+    ALTER COLUMN severity SET DEFAULT 'MINOR',
+    ALTER COLUMN status   SET DEFAULT 'OPEN';
